@@ -26,7 +26,7 @@ public:
         } else if (rank[yr] < rank[xr]) {
             parent[yr] = xr;
         } else {
-            parent[yr] = xr;
+            parent[xr] = yr;
             rank[xr]++;
         }
         components--;  // track fully connected or not , dsu.components==1 means fully connected;
