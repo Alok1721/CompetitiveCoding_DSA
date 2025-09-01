@@ -1,25 +1,35 @@
 class KMP {
     public:
         // Build the LPS (Longest Prefix Suffix) array
-        vector<int> buildLPS(const string& pattern) {
-            int n = pattern.size();
+        vector<int> computeLPS(const string &pat) {
+            int n = pat.size();
             vector<int> lps(n, 0);
-            int len = 0;
-            for (int i = 1; i < n; ++i) {
-                while (len > 0 && pattern[i] != pattern[len])
-                    len = lps[len - 1];
-                if (pattern[i] == pattern[len])
+            int len = 0;  // length of previous longest prefix suffix
+            int i = 1;
+        
+            while (i < n) {
+                if (pat[i] == pat[len]) {
                     len++;
-                lps[i] = len;
+                    lps[i] = len;
+                    i++;
+                } else {
+                    if (len > 0) {
+                        len = lps[len-1]; // fallback
+                    } else {
+                        lps[i] = 0;
+                        i++;
+                    }
+                }
             }
             return lps;
         }
+        
     
         // Returns true if pattern exists in text
         bool contains(const string& text, const string& pattern) {
             int n = text.size(), m = pattern.size();
             if (m == 0) return true;
-            vector<int> lps = buildLPS(pattern);
+            vector<int> lps = computeLPS(pattern);
             int i = 0, j = 0;
             while (i < n) {
                 if (text[i] == pattern[j]) {
