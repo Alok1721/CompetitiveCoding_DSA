@@ -1,51 +1,60 @@
 #include <bits/stdc++.h>
 using namespace std;
-
-const int N = 2e5 + 1;
-long long r = 0;
-int n;
-int a[N];
-int f[N][2];
-vector<int> adj[N];
-
-// DFS to calculate contribution of each bit
-void dfs(int u, int p, int k) {
-    int w = (a[u] >> k) & 1;
-
-    f[u][w] = 1;
-    f[u][w ^ 1] = 0;
-
-    for (int v : adj[u]) {
-        if (v == p) continue;
-        dfs(v, u, k);
-        r += 1LL * f[v][0] * f[u][1] + 1LL * f[v][1] * f[u][0];
-        r <<= k; // multiply by 2^k
-        f[u][1] += f[v][w ^ 1];
-        f[u][0] += f[v][w];
+int ans;
+void dfs(unordered_map<int,vector<int>>&graph,int src,int dest,int currXor,int parent,vector<int>&points)
+{
+    currXor^=points[src];
+ if(src==dest)
+ {
+    ans+=currXor;
+    return;
+ }   
+ for(auto child:graph[src])
+ {
+    if(child!=parent)
+    {
+        dfs(graph,child,dest,currXor,src,points);
     }
+ }
+}
+int findXorPath(vector<int>&points,vector<vector<int>>&edges)
+{
+    unordered_map<int,vector<int>>graph;
+    for(auto it:edges)
+    {
+        graph[it[0]].push_back(it[1]);
+        graph[it[1]].push_back(it[0]);
+    }
+    ans=0;
+    int n=points.size();
+    for(int i=0;i<n;i++)
+    {
+        for(int j=i;j<n;j++)
+        {
+            int currXor=0;
+            dfs(graph,i,j,currXor,-1,points);
+        }
+    }
+    return ans;
+
 }
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    cin >> n;
-    for (int i = 1; i <= n; ++i) {
-        cin >> a[i];
-        r += a[i];  // initial sum of single nodes
+int main()
+{
+    int n;
+    cin>>n;
+    vector<int>points(n);
+    for(int i=0;i<n;i++)
+    {
+        cin>>points[i];
     }
-
-    for (int i = 1; i < n; ++i) {
-        int u, v;
-        cin >> u >> v;
-        adj[u].push_back(v);
-        adj[v].push_back(u);
+    vector<vector<int>>edges;
+    for(int i=0;i<n-1;i++)
+    {
+        int u,v;
+        cin>>u>>v;
+        edges.push_back({u-1,v-1});
     }
-
-    for (int k = 19; k >= 0; --k) {
-        dfs(1, 0, k);
-    }
-
-    cout << r << "\n";
+    cout<<findXorPath(points,edges);//find the xor of all pair of path where x<=y
     return 0;
 }
