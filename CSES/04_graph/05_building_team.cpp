@@ -1,92 +1,60 @@
-#include <bits/stdc++.h>
-const int mod =1e9+7;
+#include<bits/stdc++.h>
 using namespace std;
-typedef long long ll;
 
-class BipartiteChecker {
-public:
-    vector<vector<int>> adj;
-    vector<int> color;
-    int n;
-
-    BipartiteChecker(int size) {
-        n = size;
-        adj.resize(n + 1);  // 1-based indexing
-        color.assign(n + 1, 0);  // 0: unvisited, 1 or 2: colored
-    }
-
-    void addEdge(int u, int v) {
-        adj[u].push_back(v);
-        adj[v].push_back(u);  // Undirected graph
-    }
-
-    bool isBipartiteUtil(int start) {
-        queue<int> q;
-        q.push(start);
-        color[start] = 1;
-
-        while (!q.empty()) {
-            int u = q.front();
-            q.pop();
-
-            for (int v : adj[u]) {
-                if (color[v] == 0) {
-                    color[v] = 3 - color[u]; // Alternate color
-                    q.push(v);
-                } else if (color[v] == color[u]) {
-                    return false;
-                }
+bool checkBipartite(int node,unordered_map<int,vector<int>>&graph,vector<int>&team,int color)
+{
+    team[node]=color;
+    for(auto nei:graph[node])
+    {
+        if(team[nei]==-1)
+        {
+            if(!checkBipartite(nei,graph,team,1-color))
+            {
+                return false;
             }
         }
-        return true;
-    }
-
-    bool isBipartite() {
-        for (int i = 1; i <= n; ++i) {
-            if (color[i] == 0) {
-                if (!isBipartiteUtil(i))
-                    return false;
-            }
+        else if(team[nei]==color)
+        {
+            return false;
         }
-        return true;
     }
+    return true;
 
-    vector<int> getColors() {
-        return color;
-    }
-};
-
+}
 
 
 int main()
 {
-    int t=1;
-    // cin>> t;
-    while(t--)
+    int n,m;
+    cin>>n>>m;
+    unordered_map<int,vector<int>> graph;
+    vector<pair<int,int>>friends;
+    for(int i=0;i<m;i++)
     {
-        int n,m;
-        cin>>n>>m;
-        BipartiteChecker checker(n);
-
-        for(int i=0;i<m;i++)
-        {
-            int a,b;
-            cin>>a>>b;
-            checker.addEdge(a,b);
-        }
-        if(!checker.isBipartite())
-        {
-            cout<<"IMPOSSIBLE"<<endl;
-            continue;
-        }
-
-        vector<int>teams=checker.getColors();
-        for(int i=1;i<=n;i++)
-        {
-            cout<<teams[i]<<" ";
-        }
-        cout<<endl;
-       
+        int a,b;
+        cin>>a>>b;
+        friends.push_back({a,b});
+        graph[a-1].push_back(b-1);
+        graph[b-1].push_back(a-1);
     }
+    vector<int>team(n,-1);
+    
+    for(int i=0;i<n;i++)
+    {
+        if(team[i]==-1)
+        {
+            if(!checkBipartite(i,graph,team,0))
+            {
+                cout<<"IMPOSSIBLE"<<endl;
+                return 0;
+            }
+        }
+    }
+    for(int i=0;i<n;i++)
+    {
+        cout<<team[i]+1<<" ";
+    }
+    cout<<endl;
+    
     return 0;
 }

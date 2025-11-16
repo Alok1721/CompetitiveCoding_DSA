@@ -1,42 +1,68 @@
-// The functions should be written in a way that array become sorted
-// in increasing order when heapSort() is called.
+/* 
+⏱️ Time Complexity Analysis
+Case	Explanation	Time Complexity
+------------------------------------------------------------------------------------
+Best Case	Even if array is already sorted, heapify is still required	O(n log n)
+Average Case	Each element insertion/extraction takes log n	O(n log n)
+Worst Case	Same as average (no case-dependent degradation)	O(n log n)
 
-class Solution {
-  public:
-    // Function to sort an array using Heap Sort.
-    void heapify(vector<int>&arr,int n,int i)
+Heapify single call: O(log n)
+Building heap: O(n)
+Extracting elements: n × O(log n) = O(n log n)
+-----------------------------------------------------------------------------------
+*/
+
+#include<bits/stdc++.h>
+using namespace std;
+
+void heapify(vector<int>&nums,int n,int node)
+{
+    int largest=node;
+    int leftNode=2*node+1;
+    int rightNode=2*node+2;
+    if(leftNode<n && nums[leftNode]>nums[largest])
     {
-        int left=2*i+1;
-        int right=2*i+2;
-        int largest=i;
-        
-        if(left<n && arr[left]>arr[largest])
-        {
-            largest=left;    
-        }
-        if(right<n && arr[right]>arr[largest])
-        {
-            largest=right;    
-        }
-        if(largest!=i)
-        {
-            swap(arr[i],arr[largest]);
-            heapify(arr,n,largest);//heapify the affected node
-        }
-        
+        largest=leftNode;
     }
-    void heapSort(vector<int>& arr) {
-        // code here
-        int n=arr.size();
-        for(int i=n/2-1;i>=0;i--)//from last non-leaf node
-        {
-            heapify(arr,n,i);
-        }
-        for(int i=n-1;i>=0;i--)
-        {
-            swap(arr[0],arr[i]);
-            heapify(arr,i,0);
-        }
-        
+    if(rightNode<n && nums[rightNode]>nums[largest])
+    {
+        largest=rightNode;
     }
-};
+    if(largest!=node)
+    {
+        swap(nums[largest],nums[node]);
+        heapify(nums,n,largest);
+    }
+}
+
+void heapSort(vector<int>&nums)
+{
+    int n=nums.size();
+    for(int i=n-1;i>=0;i--)
+    {
+        heapify(nums,n,i);//satifying the property where ith node is greater than its both left, right nodes
+    }
+    for(int i=n-1;i>=0;i--)
+    {
+        swap(nums[i],nums[0]);
+        heapify(nums,i,0);//affected node is 0, because we sending the largest element to last of array
+    }
+}
+
+int main()
+{
+    int n;
+    cin>>n;
+    vector<int>nums(n);
+    for(int i=0;i<n;i++)
+    {
+        cin>>nums[i];
+    }
+    heapSort(nums);
+    for(auto it:nums)
+    {
+        cout<<it<<" ";
+    }
+    cout<<endl;
+    return 0;
+}

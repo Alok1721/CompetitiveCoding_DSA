@@ -1,38 +1,61 @@
 #include<bits/stdc++.h>
 using namespace std;
-int solve(vector<int>&students,int left,int right,int k)
+
+int minCostToReach(vector<int>&camelCost)
 {
-    if(right-left+1<3)return right-left+1;
-    int ans=right-left+1;
-    for(int i=left+1;i<=right;i++)
+    int n=camelCost.size();
+    multiset<int>mt(camelCost.begin(),camelCost.end());
+    bool isSmall=true;
+    int totalCost=0;
+    priority_queue<int,vector<int>,greater<int>>pq;
+    while(true)
     {
-        if(students[i-1]+k==students[i]&&students[i]+k==students[i+1])
+        int a,b;
+        if(isSmall)
         {
-            int leftRem=solve(students,left,i-2,k);
-            int rightRem=solve(students,i+2,right,k);
-            ans=min(ans,leftRem+rightRem);
+            auto it=mt.begin();
+            a=*it;it= mt.erase(it);
+            b=*it;mt.erase(it);
         }
+        else
+        {
+            auto it=prev(mt.end());
+            a=*it;mt.erase(it);
+            it=prev(mt.end());
+            b=*it;mt.erase(it);
+        }
+        
+        
+        pq.push(a);
+        pq.push(b);
+        if(mt.empty())
+        {
+            totalCost+=max(a,b);
+            break;
+        }
+        else
+        {
+            totalCost+=max(a,b);
+            totalCost+=pq.top();
+            pq.pop();
+            isSmall=!isSmall;
+        }
+        cout<<a<<" "<<b <<" "<<totalCost<<endl;
     }
-    return ans;
+    return totalCost;
+
 }
-
-
-int findMinStudent(vector<int>students,int k)
-{
-    return solve(students, 0, students.size() - 1,k);
-}
-
 
 int main()
 {
-    int n,k;
-    cin >> n>>k;
-    vector<int> students(n);
-    for(int i = 0; i < n; i++)
-    {
-        cin >> students[i];
-    }
-    cout<<findMinStudent(students,k)<<endl;
 
+    int n;
+    cin>>n;
+    vector<int>camelCost(n);
+    for(int i=0;i<n;i++)
+    {
+        cin>>camelCost[i];
+    }
+    cout<<minCostToReach(camelCost)<<endl;
     return 0;
 }
