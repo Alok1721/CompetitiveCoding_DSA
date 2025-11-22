@@ -107,11 +107,11 @@ public:
 
     bool canIssue(int memberId, int bookId) {
         if (!members.count(memberId)) {
-            cout << "Member not present" << endl;
+            cout << "Member not present,Register first" << endl;
             return false;
         }
         if (!books.count(bookId)) {
-            cout << "Book not present" << endl;
+            cout << "Book not present,add the BOOK in Library system" << endl;
             return false;
         }
 
